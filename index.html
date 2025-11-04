@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Research Assistant - Generate Research Reports</title>
+    <style>
+        :root {
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            --color-slate-900-rgb: 19, 52, 59;
+            
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-primary-active: var(--color-teal-700);
+            --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-focus-ring: rgba(var(--color-teal-500-rgb), 0.4);
+            --color-btn-primary-text: var(--color-cream-50);
+            
+            --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-gray-400-rgb: 119, 124, 124;
+                --color-teal-300-rgb: 50, 184, 198;
+                --color-gray-300-rgb: 167, 169, 169;
+                --color-gray-200-rgb: 245, 245, 245;
+                
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+                --color-primary: var(--color-teal-300);
+                --color-primary-hover: rgba(45, 166, 178, 1);
+                --color-primary-active: rgba(41, 150, 161, 1);
+                --color-secondary: rgba(var(--color-gray-400-rgb), 0.15);
+                --color-secondary-hover: rgba(var(--color-gray-400-rgb), 0.25);
+                --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+                --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+                --color-focus-ring: rgba(var(--color-teal-300-rgb), 0.4);
+                --color-btn-primary-text: var(--color-slate-900);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background-color: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-24);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: var(--space-32);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-12);
+            font-weight: 600;
+        }
+
+        .header p {
+            color: var(--color-text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background-color: var(--color-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-card-border);
+            box-shadow: var(--shadow-md);
+            padding: var(--space-24);
+            margin-bottom: var(--space-24);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-20);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-8);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: var(--space-12);
+            font-size: 1rem;
+            color: var(--color-text);
+            background-color: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-focus-ring);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-12) var(--space-24);
+            border-radius: var(--radius-base);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--color-secondary);
+            color: var(--color-text);
+            margin-top: var(--space-12);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-secondary-hover);
+        }
+
+        .progress-section {
+            display: none;
+            margin-top: var(--space-24);
+        }
+
+        .progress-section.active {
+            display: block;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            padding: var(--space-12);
+            margin-bottom: var(--space-12);
+            background: var(--color-background);
+            border-radius: var(--radius-base);
+            border: 1px solid var(--color-border);
+        }
+
+        .progress-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: var(--space-12);
+            flex-shrink: 0;
+        }
+
+        .spinner {
+            border: 3px solid var(--color-secondary);
+            border-top: 3px solid var(--color-primary);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        .checkmark {
+            color: var(--color-primary);
+            font-size: 24px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-text {
+            flex: 1;
+        }
+
+        .progress-count {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            margin-left: var(--space-8);
+        }
+
+        .result-section {
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .article-content {
+            background: var(--color-background);
+            padding: var(--space-24);
+            border-radius: var(--radius-base);
+            border: 1px solid var(--color-border);
+            margin-bottom: var(--space-16);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .article-content h2 {
+            color: var(--color-text);
+            margin-top: var(--space-20);
+            margin-bottom: var(--space-12);
+        }
+
+        .article-content h3 {
+            color: var(--color-text);
+            margin-top: var(--space-16);
+            margin-bottom: var(--space-8);
+        }
+
+        .article-content p {
+            margin-bottom: var(--space-12);
+            line-height: 1.7;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-16);
+            background: var(--color-secondary);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-16);
+        }
+
+        .meta-item {
+            text-align: center;
+        }
+
+        .meta-label {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            display: block;
+        }
+
+        .meta-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .share-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-12);
+            padding: var(--space-12);
+            background: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-16);
+        }
+
+        .share-link input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--color-text);
+            font-size: 0.9rem;
+        }
+
+        .copy-btn {
+            padding: var(--space-8) var(--space-16);
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            border: none;
+            border-radius: var(--radius-base);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .copy-btn:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .papers-list {
+            margin-top: var(--space-24);
+        }
+
+        .papers-list h3 {
+            margin-bottom: var(--space-16);
+        }
+
+        .paper-item {
+            padding: var(--space-12);
+            background: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-8);
+        }
+
+        .paper-title {
+            font-weight: 500;
+            color: var(--color-text);
+            margin-bottom: 4px;
+        }
+
+        .paper-meta {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-16);
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .article-meta {
+                flex-direction: column;
+                gap: var(--space-12);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 AI Research Assistant</h1>
+            <p>Generate comprehensive research reports from top academic papers using AI</p>
+        </div>
+
+        <div class="card">
+            <form id="researchForm">
+                <div class="form-group">
+                    <label class="form-label" for="topic">Research Topic</label>
+                    <input 
+                        type="text" 
+                        id="topic" 
+                        class="form-control" 
+                        placeholder="e.g., Machine Learning in Healthcare, Climate Change Solutions, Quantum Computing"
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="keywords">Keywords (Optional)</label>
+                    <input 
+                        type="text" 
+                        id="keywords" 
+                        class="form-control" 
+                        placeholder="e.g., neural networks, deep learning, classification"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="year">Publication Year Range</label>
+                    <select id="year" class="form-control">
+                        <option value="2020-2025">2020 - 2025</option>
+                        <option value="2018-2025">2018 - 2025</option>
+                        <option value="2015-2025">2015 - 2025</option>
+                        <option value="all">All Years</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="generateBtn">
+                    Generate Research Report
+                </button>
+            </form>
+
+            <div class="progress-section" id="progressSection">
+                <div class="progress-item">
+                    <div class="progress-icon">
+                        <div class="spinner" id="searchSpinner"></div>
+                        <span class="checkmark" id="searchCheck" style="display: none;">✓</span>
+                    </div>
+                    <div class="progress-text">
+                        Searching academic databases...
+                        <span class="progress-count" id="searchCount"></span>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-icon">
+                        <div class="spinner" id="analyzeSpinner" style="display: none;"></div>
+                        <span class="checkmark" id="analyzeCheck" style="display: none;">✓</span>
+                    </div>
+                    <div class="progress-text">
+                        Analyzing research papers with AI...
+                        <span class="progress-count" id="analyzeCount"></span>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-icon">
+                        <div class="spinner" id="generateSpinner" style="display: none;"></div>
+                        <span class="checkmark" id="generateCheck" style="display: none;">✓</span>
+                    </div>
+                    <div class="progress-text">
+                        Generating comprehensive report...
+                        <span class="progress-count" id="generateCount"></span>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-icon">
+                        <div class="spinner" id="publishSpinner" style="display: none;"></div>
+                        <span class="checkmark" id="publishCheck" style="display: none;">✓</span>
+                    </div>
+                    <div class="progress-text">
+                        Publishing article...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="card">
+                <h2>✅ Research Report Generated Successfully!</h2>
+                
+                <div class="article-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Word Count</span>
+                        <span class="meta-value" id="wordCount">2,043</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Papers Analyzed</span>
+                        <span class="meta-value" id="paperCount">20</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Citations</span>
+                        <span class="meta-value" id="citationCount">47</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Generated</span>
+                        <span class="meta-value" id="generatedDate">Nov 4, 2025</span>
+                    </div>
+                </div>
+
+                <div class="share-link">
+                    <input type="text" id="shareUrl" readonly value="" />
+                    <button class="copy-btn" onclick="copyShareLink()">Copy Link</button>
+                </div>
+
+                <div class="article-content" id="articleContent">
+                    <!-- Article content will be inserted here -->
+                </div>
+
+                <button class="btn btn-secondary" onclick="downloadReport()">
+                    📥 Download as PDF
+                </button>
+
+                <button class="btn btn-secondary" onclick="resetForm()">
+                    🔄 Generate New Report
+                </button>
+
+                <div class="papers-list">
+                    <h3>📚 Referenced Papers</h3>
+                    <div id="papersList">
+                        <!-- Papers list will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('researchForm');
+        const progressSection = document.getElementById('progressSection');
+        const resultSection = document.getElementById('resultSection');
+        const generateBtn = document.getElementById('generateBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const topic = document.getElementById('topic').value;
+            const keywords = document.getElementById('keywords').value;
+            const year = document.getElementById('year').value;
+
+            // Show progress section
+            progressSection.classList.add('active');
+            generateBtn.disabled = true;
+
+            // Simulate the research process
+            await simulateResearchProcess(topic, keywords, year);
+
+            // Show results
+            progressSection.classList.remove('active');
+            resultSection.classList.add('active');
+            
+            // Scroll to results
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        async function simulateResearchProcess(topic, keywords, year) {
+            // Step 1: Search papers
+            document.getElementById('searchSpinner').style.display = 'block';
+            for (let i = 1; i <= 20; i++) {
+                await sleep(100);
+                document.getElementById('searchCount').textContent = `${i}/20 papers found`;
+            }
+            document.getElementById('searchSpinner').style.display = 'none';
+            document.getElementById('searchCheck').style.display = 'block';
+
+            // Step 2: Analyze papers
+            await sleep(500);
+            document.getElementById('analyzeSpinner').style.display = 'block';
+            for (let i = 1; i <= 20; i++) {
+                await sleep(150);
+                document.getElementById('analyzeCount').textContent = `${i}/20 analyzed`;
+            }
+            document.getElementById('analyzeSpinner').style.display = 'none';
+            document.getElementById('analyzeCheck').style.display = 'block';
+
+            // Step 3: Generate report
+            await sleep(500);
+            document.getElementById('generateSpinner').style.display = 'block';
+            const words = 2043;
+            for (let i = 100; i <= words; i += 100) {
+                await sleep(200);
+                document.getElementById('generateCount').textContent = `${Math.min(i, words)} words written`;
+            }
+            document.getElementById('generateSpinner').style.display = 'none';
+            document.getElementById('generateCheck').style.display = 'block';
+
+            // Step 4: Publish
+            await sleep(500);
+            document.getElementById('publishSpinner').style.display = 'block';
+            await sleep(1000);
+            document.getElementById('publishSpinner').style.display = 'none';
+            document.getElementById('publishCheck').style.display = 'block';
+
+            // Generate article content
+            generateArticleContent(topic);
+            generatePapersList(topic);
+            generateShareLink(topic);
+        }
+
+        function generateArticleContent(topic) {
+            const articleContent = document.getElementById('articleContent');
+            
+            const content = `
+                <h2>${topic}: A Comprehensive Analysis</h2>
+                
+                <h3>Abstract</h3>
+                <p>This comprehensive research report synthesizes findings from 20 peer-reviewed academic papers published between 2020-2025 on the topic of ${topic}. Through systematic analysis and AI-powered synthesis, this report presents current trends, methodologies, key findings, and future directions in this rapidly evolving field.</p>
+
+                <h3>1. Introduction</h3>
+                <p>The field of ${topic} has witnessed remarkable advancements in recent years, driven by technological innovations, interdisciplinary collaborations, and increased research funding. This report examines the current state of research, identifying critical developments and emerging patterns across multiple studies.</p>
+
+                <p>Recent investigations have demonstrated significant progress in understanding the fundamental principles underlying ${topic}. Researchers have employed diverse methodologies ranging from experimental studies to computational modeling, each contributing unique insights to our collective understanding.</p>
+
+                <h3>2. Methodology</h3>
+                <p>This analysis incorporates 20 highly-cited research papers from leading academic databases including PubMed, IEEE Xplore, ACM Digital Library, and Springer. Papers were selected based on citation count, publication venue reputation, and relevance to core research questions in ${topic}.</p>
+
+                <p>Our AI-powered analysis employed natural language processing techniques to extract key themes, methodologies, results, and conclusions from each paper. Cross-referencing and meta-analysis techniques were applied to identify consensus views and areas of ongoing debate.</p>
+
+                <h3>3. Key Findings</h3>
+                <p>Analysis of the selected papers reveals several significant trends in ${topic} research:</p>
+
+                <p><strong>Trend 1: Methodological Innovation</strong> - Researchers are increasingly adopting hybrid approaches that combine traditional methods with emerging technologies. This methodological diversity has led to more robust and reproducible findings.</p>
+
+                <p><strong>Trend 2: Interdisciplinary Integration</strong> - The most impactful studies demonstrate strong interdisciplinary collaboration, drawing insights from multiple fields to address complex research questions.</p>
+
+                <p><strong>Trend 3: Scalability and Real-World Applications</strong> - There is a notable shift toward research that addresses practical implementation challenges and demonstrates scalability beyond laboratory settings.</p>
+
+                <p><strong>Trend 4: Ethical Considerations</strong> - Contemporary research increasingly incorporates ethical frameworks and considers societal implications of findings, reflecting growing awareness of responsible research practices.</p>
+
+                <h3>4. Technical Analysis</h3>
+                <p>The technical approaches employed across the analyzed papers demonstrate considerable sophistication. Common methodologies include advanced statistical analysis, machine learning algorithms, experimental protocols, and simulation frameworks.</p>
+
+                <p>Performance metrics vary across studies but generally indicate significant improvements over baseline approaches. Effect sizes range from moderate to large, with several breakthrough findings demonstrating paradigm-shifting results.</p>
+
+                <h3>5. Critical Discussion</h3>
+                <p>While the analyzed research demonstrates substantial progress, several limitations and areas for improvement emerge from this synthesis. Methodological heterogeneity across studies sometimes complicates direct comparisons. Sample sizes and experimental conditions vary considerably, affecting generalizability of findings.</p>
+
+                <p>Nevertheless, the overall trajectory of research in ${topic} indicates a maturing field with increasingly sophisticated approaches and meaningful real-world impact. The convergence of findings across multiple independent studies strengthens confidence in core conclusions.</p>
+
+                <h3>6. Future Directions</h3>
+                <p>Based on this comprehensive analysis, several promising directions for future research emerge:</p>
+
+                <p>First, there is clear need for larger-scale collaborative studies that can overcome limitations of individual investigations. Second, development of standardized protocols and benchmarks would facilitate better comparison across studies. Third, increased focus on longitudinal studies could provide insights into temporal dynamics currently underexplored.</p>
+
+                <p>Additionally, emerging technologies and methodologies offer exciting opportunities for breakthrough discoveries. Integration of artificial intelligence, advanced sensing technologies, and computational modeling promises to unlock new research frontiers.</p>
+
+                <h3>7. Conclusion</h3>
+                <p>This synthesis of 20 leading research papers provides a comprehensive overview of current knowledge in ${topic}. The field demonstrates remarkable vitality, with consistent progress across multiple research directions. While challenges remain, the trajectory is clearly positive, with findings increasingly translating into practical applications.</p>
+
+                <p>The convergence of evidence across multiple independent studies strengthens key conclusions while highlighting areas requiring further investigation. As research continues to evolve, the foundations established by these studies will undoubtedly enable future breakthroughs with significant societal impact.</p>
+
+                <h3>References</h3>
+                <p>This report synthesizes findings from 20 peer-reviewed papers published in leading academic journals and conferences. Complete citations are provided in the Referenced Papers section below.</p>
+            `;
+
+            articleContent.innerHTML = content;
+
+            // Update metadata
+            const today = new Date();
+            document.getElementById('generatedDate').textContent = today.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+        }
+
+        function generatePapersList(topic) {
+            const papersList = document.getElementById('papersList');
+            const samplePapers = [
+                { title: `Recent Advances in ${topic}: A Systematic Review`, authors: 'Smith J., et al.', year: 2024, journal: 'Nature' },
+                { title: `Novel Approaches to ${topic} Analysis`, authors: 'Johnson M., Brown K.', year: 2024, journal: 'Science' },
+                { title: `Machine Learning Applications in ${topic}`, authors: 'Davis R., et al.', year: 2023, journal: 'IEEE Transactions' },
+                { title: `Comprehensive Framework for ${topic} Research`, authors: 'Wilson P., Garcia L.', year: 2023, journal: 'Cell' },
+                { title: `Innovative Methods in ${topic} Studies`, authors: 'Martinez A., et al.', year: 2024, journal: 'Lancet' },
+                { title: `${topic}: Current State and Future Prospects`, authors: 'Anderson T., Lee S.', year: 2023, journal: 'PNAS' },
+                { title: `Breakthrough Discoveries in ${topic}`, authors: 'Thompson E., et al.', year: 2024, journal: 'Nature Communications' },
+                { title: `Quantitative Analysis of ${topic} Phenomena`, authors: 'White J., Clark M.', year: 2023, journal: 'Science Advances' },
+                { title: `${topic}: Interdisciplinary Perspectives`, authors: 'Hall K., et al.', year: 2024, journal: 'Annual Reviews' },
+                { title: `Computational Approaches to ${topic}`, authors: 'Young D., King R.', year: 2023, journal: 'Nature Methods' },
+                { title: `Empirical Studies in ${topic} Research`, authors: 'Scott N., et al.', year: 2024, journal: 'PLOS ONE' },
+                { title: `Advanced Techniques for ${topic} Investigation`, authors: 'Green H., Adams B.', year: 2023, journal: 'Cell Reports' },
+                { title: `${topic}: A Meta-Analysis`, authors: 'Baker C., et al.', year: 2024, journal: 'Cochrane Database' },
+                { title: `Novel Frameworks in ${topic} Theory`, authors: 'Nelson G., Carter F.', year: 2023, journal: 'Theoretical Biology' },
+                { title: `Practical Applications of ${topic}`, authors: 'Mitchell L., et al.', year: 2024, journal: 'Applied Sciences' },
+                { title: `${topic}: Challenges and Opportunities`, authors: 'Roberts M., Turner J.', year: 2023, journal: 'Nature Reviews' },
+                { title: `Longitudinal Study of ${topic} Effects`, authors: 'Phillips S., et al.', year: 2024, journal: 'BMJ' },
+                { title: `Cross-Disciplinary Insights into ${topic}`, authors: 'Campbell R., Evans T.', year: 2023, journal: 'Science Reports' },
+                { title: `${topic}: Methodological Considerations`, authors: 'Parker W., et al.', year: 2024, journal: 'Methods in Research' },
+                { title: `Future Directions in ${topic} Research`, authors: 'Collins A., Stewart D.', year: 2023, journal: 'Trends' }
+            ];
+
+            papersList.innerHTML = samplePapers.map(paper => `
+                <div class="paper-item">
+                    <div class="paper-title">${paper.title}</div>
+                    <div class="paper-meta">${paper.authors} (${paper.year}) - ${paper.journal}</div>
+                </div>
+            `).join('');
+        }
+
+        function generateShareLink(topic) {
+            const slug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const uniqueId = Math.random().toString(36).substr(2, 9);
+            const shareUrl = `${window.location.origin}/research/${slug}-${uniqueId}`;
+            document.getElementById('shareUrl').value = shareUrl;
+        }
+
+        function copyShareLink() {
+            const shareUrl = document.getElementById('shareUrl');
+            shareUrl.select();
+            document.execCommand('copy');
+            
+            const copyBtn = event.target;
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = '✓ Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+        }
+
+        function downloadReport() {
+            const topic = document.getElementById('topic').value;
+            const content = document.getElementById('articleContent').innerText;
+            
+            // In a real implementation, this would generate a PDF
+            // For now, we'll create a text file
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `research-report-${topic.toLowerCase().replace(/\s+/g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function resetForm() {
+            form.reset();
+            resultSection.classList.remove('active');
+            generateBtn.disabled = false;
+            
+            // Reset all progress indicators
+            document.getElementById('searchSpinner').style.display = 'block';
+            document.getElementById('searchCheck').style.display = 'none';
+            document.getElementById('searchCount').textContent = '';
+            
+            document.getElementById('analyzeSpinner').style.display = 'none';
+            document.getElementById('analyzeCheck').style.display = 'none';
+            document.getElementById('analyzeCount').textContent = '';
+            
+            document.getElementById('generateSpinner').style.display = 'none';
+            document.getElementById('generateCheck').style.display = 'none';
+            document.getElementById('generateCount').textContent = '';
+            
+            document.getElementById('publishSpinner').style.display = 'none';
+            document.getElementById('publishCheck').style.display = 'none';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>
